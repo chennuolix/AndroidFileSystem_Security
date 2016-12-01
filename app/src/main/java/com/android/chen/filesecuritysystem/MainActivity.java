@@ -1,16 +1,14 @@
 package com.android.chen.filesecuritysystem;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
+
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -21,13 +19,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        initView();
 
+    }
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+    private void initView() {
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar);
+        mCollapsingToolbarLayout.setTitle("文件加解密系统");
+        mCollapsingToolbarLayout.setExpandedTitleColor(R.color.white);
+        mCollapsingToolbarLayout.setCollapsedTitleTextColor(R.color.black);
     }
 
     @Override
