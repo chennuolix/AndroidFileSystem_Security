@@ -40,23 +40,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        app:behavior_overlapTop="30dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="wrap_content"
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvFileList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:cardElevation="8dp"
-            app:contentPadding="16dp">
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="8dp"
-                android:text="@string/person_info" />
-
-        </android.support.v7.widget.CardView>
+        </android.support.v7.widget.RecyclerView>
 
     </android.support.v4.widget.NestedScrollView>
 

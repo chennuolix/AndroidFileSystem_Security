@@ -3,12 +3,32 @@ package com.android.chen.filesecuritysystem;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
+import com.android.chen.filesecuritysystem.Bean.FileItem;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
+    static final String ROOT_PATH = "/";
+
     CollapsingToolbarLayout mCollapsingToolbarLayout;
+    List<FileItem> fileItems = new ArrayList<>();
+
+    FileListAdapter mAdapter;
+
+    RecyclerView rvFileList;
+
+    LinearLayoutManager linearLayoutManager;
+
+    static final String TAG = "TAG_MainActivity";
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -20,7 +40,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-
+        showFileDir(ROOT_PATH);
     }
 
     private void initView() {
@@ -28,29 +48,45 @@ public class MainActivity extends Activity {
         mCollapsingToolbarLayout.setTitle("文件加解密系统");
         mCollapsingToolbarLayout.setExpandedTitleColor(R.color.white);
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(R.color.black);
+        rvFileList = (RecyclerView) findViewById(R.id.rvFileList);
+        linearLayoutManager = new LinearLayoutManager(MainActivity.this,LinearLayoutManager.VERTICAL,false);
+        rvFileList.setLayoutManager(linearLayoutManager);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    private void showFileDir(String path) {
+        File file = new File(path);
+        File[] files = file.listFiles();
+        FileItem fileItem;
+        String fileName;
+        String filePath;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        File typeFile;
+        if (files != null) {
+            for (File file1 : files) {
+                fileItem = new FileItem();
+                fileName = file1.getName();
+                filePath = file1.getAbsolutePath();
+                fileItem.setFileName(fileName);
+                fileItem.setFilePath(file1.getAbsolutePath());
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+                typeFile = new File(filePath);
+                if (!typeFile.isDirectory()) {
+                    fileItem.setType(FileItem.TYPE_FILE_DECRYPT);
+                    if (fileName.length() > 7) {
+                        if (fileName.substring(fileName.length() - 7).equalsIgnoreCase(".cipher")) {
+                            fileItem.setType(FileItem.TYPE_FILE_ENCRYPTED);
+                        }
+                    }
+                } else {
+                    fileItem.setType(FileItem.TYPE_DIRECTPRY);
+                }
+                fileItems.add(fileItem);
+            }
         }
-
-        return super.onOptionsItemSelected(item);
+        mAdapter = new FileListAdapter(MainActivity.this,fileItems);
+        rvFileList.setAdapter(mAdapter);
     }
+
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
