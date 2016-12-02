@@ -6,10 +6,10 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
 import com.android.chen.filesecuritysystem.Bean.FileItem;
+import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +27,13 @@ public class MainActivity extends Activity {
     RecyclerView rvFileList;
 
     LinearLayoutManager linearLayoutManager;
+
+    ItemClickCallback itemClickCallback = new ItemClickCallback() {
+        @Override
+        public void updateView(String path) {
+            showFileDir(path);
+        }
+    };
 
     static final String TAG = "TAG_MainActivity";
 
@@ -49,8 +56,9 @@ public class MainActivity extends Activity {
         mCollapsingToolbarLayout.setExpandedTitleColor(R.color.white);
         mCollapsingToolbarLayout.setCollapsedTitleTextColor(R.color.black);
         rvFileList = (RecyclerView) findViewById(R.id.rvFileList);
-        linearLayoutManager = new LinearLayoutManager(MainActivity.this,LinearLayoutManager.VERTICAL,false);
+        linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
         rvFileList.setLayoutManager(linearLayoutManager);
+        rvFileList.setNestedScrollingEnabled(false);
     }
 
     private void showFileDir(String path) {
@@ -59,15 +67,15 @@ public class MainActivity extends Activity {
         FileItem fileItem;
         String fileName;
         String filePath;
-
         File typeFile;
+        fileItems.clear();
         if (files != null) {
             for (File file1 : files) {
                 fileItem = new FileItem();
                 fileName = file1.getName();
                 filePath = file1.getAbsolutePath();
                 fileItem.setFileName(fileName);
-                fileItem.setFilePath(file1.getAbsolutePath());
+                fileItem.setFilePath(filePath);
 
                 typeFile = new File(filePath);
                 if (!typeFile.isDirectory()) {
@@ -83,7 +91,7 @@ public class MainActivity extends Activity {
                 fileItems.add(fileItem);
             }
         }
-        mAdapter = new FileListAdapter(MainActivity.this,fileItems);
+        mAdapter = new FileListAdapter(MainActivity.this, fileItems, itemClickCallback);
         rvFileList.setAdapter(mAdapter);
     }
 
@@ -93,4 +101,6 @@ public class MainActivity extends Activity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+
 }
