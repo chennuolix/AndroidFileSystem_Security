@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
 import com.android.chen.filesecuritysystem.Bean.FileItem;
 import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
+import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        FilePathHeap.push(ROOT_PATH);
         showFileDir(ROOT_PATH);
     }
 
@@ -68,7 +69,11 @@ public class MainActivity extends Activity {
         String fileName;
         String filePath;
         File typeFile;
-        fileItems.clear();
+        fileItems = new ArrayList<>();
+        /**
+         * 增加第一个返回上个路径的item
+         */
+        addFirstItem();
         if (files != null) {
             for (File file1 : files) {
                 fileItem = new FileItem();
@@ -76,7 +81,6 @@ public class MainActivity extends Activity {
                 filePath = file1.getAbsolutePath();
                 fileItem.setFileName(fileName);
                 fileItem.setFilePath(filePath);
-
                 typeFile = new File(filePath);
                 if (!typeFile.isDirectory()) {
                     fileItem.setType(FileItem.TYPE_FILE_DECRYPT);
@@ -95,6 +99,13 @@ public class MainActivity extends Activity {
         rvFileList.setAdapter(mAdapter);
     }
 
+
+    private void addFirstItem() {
+        FileItem fileItem = new FileItem();
+        fileItem.setType(FileItem.TYPE_DIRECTPRY);
+        fileItem.setFileName("..");
+        fileItems.add(fileItem);
+    }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
