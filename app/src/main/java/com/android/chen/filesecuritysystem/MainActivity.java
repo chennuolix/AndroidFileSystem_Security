@@ -1,16 +1,41 @@
 package com.android.chen.filesecuritysystem;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
+import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
+import com.android.chen.filesecuritysystem.Bean.FileItem;
+import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
+import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends Activity {
+
+    static final String ROOT_PATH = "/";
+
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
+    List<FileItem> fileItems = new ArrayList<>();
+
+    FileListAdapter mAdapter;
+
+    RecyclerView rvFileList;
+
+    LinearLayoutManager linearLayoutManager;
+
+    ItemClickCallback itemClickCallback = new ItemClickCallback() {
+        @Override
+        public void updateView(String path) {
+            showFileDir(path);
+        }
+    };
+
+    static final String TAG = "TAG_MainActivity";
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -21,35 +46,65 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        initView();
+        FilePathHeap.push(ROOT_PATH);
+        showFileDir(ROOT_PATH);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    private void initView() {
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar);
+        mCollapsingToolbarLayout.setTitle("文件加解密系统");
+        mCollapsingToolbarLayout.setExpandedTitleColor(R.color.white);
+        mCollapsingToolbarLayout.setCollapsedTitleTextColor(R.color.black);
+        rvFileList = (RecyclerView) findViewById(R.id.rvFileList);
+        linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
+        rvFileList.setLayoutManager(linearLayoutManager);
+        rvFileList.setNestedScrollingEnabled(false);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    private void showFileDir(String path) {
+        File file = new File(path);
+        File[] files = file.listFiles();
+        FileItem fileItem;
+        String fileName;
+        String filePath;
+        File typeFile;
+        fileItems = new ArrayList<>();
+        /**
+         * 增加第一个返回上个路径的item
+         */
+        addFirstItem();
+        if (files != null) {
+            for (File file1 : files) {
+                fileItem = new FileItem();
+                fileName = file1.getName();
+                filePath = file1.getAbsolutePath();
+                fileItem.setFileName(fileName);
+                fileItem.setFilePath(filePath);
+                typeFile = new File(filePath);
+                if (!typeFile.isDirectory()) {
+                    fileItem.setType(FileItem.TYPE_FILE_DECRYPT);
+                    if (fileName.length() > 7) {
+                        if (fileName.substring(fileName.length() - 7).equalsIgnoreCase(".cipher")) {
+                            fileItem.setType(FileItem.TYPE_FILE_ENCRYPTED);
+                        }
+                    }
+                } else {
+                    fileItem.setType(FileItem.TYPE_DIRECTPRY);
+                }
+                fileItems.add(fileItem);
+            }
         }
+        mAdapter = new FileListAdapter(MainActivity.this, fileItems, itemClickCallback);
+        rvFileList.setAdapter(mAdapter);
+    }
 
-        return super.onOptionsItemSelected(item);
+
+    private void addFirstItem() {
+        FileItem fileItem = new FileItem();
+        fileItem.setType(FileItem.TYPE_DIRECTPRY);
+        fileItem.setFileName("..");
+        fileItems.add(fileItem);
     }
 
     /**
@@ -57,4 +112,6 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+
 }
