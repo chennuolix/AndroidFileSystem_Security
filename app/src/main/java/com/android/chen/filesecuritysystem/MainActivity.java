@@ -1,14 +1,22 @@
 package com.android.chen.filesecuritysystem;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
 import com.android.chen.filesecuritysystem.Bean.FileItem;
 import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
+import com.android.chen.filesecuritysystem.Callback.ItemLongClickCallback;
 import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
 
 import java.io.File;
@@ -28,10 +36,109 @@ public class MainActivity extends Activity {
 
     LinearLayoutManager linearLayoutManager;
 
+    AlertDialog.Builder alertDialogBuilder;
+
+    View view_alertDialog;
+    EditText etPasswd;
+    EditText etConfirmPasswd;
+    LinearLayout llConfirmView;
+
     ItemClickCallback itemClickCallback = new ItemClickCallback() {
         @Override
         public void updateView(String path) {
             showFileDir(path);
+        }
+    };
+
+    ItemLongClickCallback itemLongClickCallback = new ItemLongClickCallback() {
+        @Override
+        public void longClick(String type) {
+            switch (type) {
+                case FileItem.TYPE_DIRECTPRY:
+                    alertDialogBuilder.setTitle("sorry");
+                    alertDialogBuilder.setMessage("对不起，暂不支持文件夹加密");
+                    alertDialogBuilder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alertDialogBuilder.setCancelable(false);
+                    alertDialogBuilder.show();
+                    break;
+                case FileItem.TYPE_FILE_DECRYPT:
+                    /**
+                     * 长按未加密文件
+                     */
+                    view_alertDialog = getLayoutInflater().inflate(R.layout.view_alertdialog, null);
+                    etPasswd = (EditText) view_alertDialog.findViewById(R.id.etPasswd);
+                    etConfirmPasswd = (EditText) view_alertDialog.findViewById(R.id.etConfirmPasswd);
+                    alertDialogBuilder.setTitle("加密提示");
+                    alertDialogBuilder.setView(view_alertDialog);
+                    alertDialogBuilder.setPositiveButton("加密", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String passwd = etPasswd.getText().toString();
+                            String confirmPasswd = etConfirmPasswd.getText().toString();
+                            if (!passwd.equals("") && !confirmPasswd.equals("")) {
+                                if (passwd.equals(confirmPasswd)) {
+                                    dialog.dismiss();
+                                    /**
+                                     * 加密文件
+                                     */
+                                    EncryptFile();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(MainActivity.this, "请输入密码，并确认密码!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alertDialogBuilder.setCancelable(false);
+                    alertDialogBuilder.show();
+                    break;
+                case FileItem.TYPE_FILE_ENCRYPTED:
+                    /**
+                     * 长按加密文件
+                     */
+                    view_alertDialog = getLayoutInflater().inflate(R.layout.view_alertdialog, null);
+                    etPasswd = (EditText) view_alertDialog.findViewById(R.id.etPasswd);
+                    etConfirmPasswd = (EditText) view_alertDialog.findViewById(R.id.etConfirmPasswd);
+                    llConfirmView = (LinearLayout) view_alertDialog.findViewById(R.id.confirmView);
+                    llConfirmView.setVisibility(View.GONE);
+                    alertDialogBuilder.setTitle("解密提示");
+                    alertDialogBuilder.setView(view_alertDialog);
+                    alertDialogBuilder.setPositiveButton("解密", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String passwd = etPasswd.getText().toString();
+                            if (!passwd.equals("")) {
+                                /**
+                                 * 解密文件
+                                 */
+                                EncryptFile();
+                            } else {
+                                Toast.makeText(MainActivity.this, "请输入密码!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alertDialogBuilder.setCancelable(false);
+                    alertDialogBuilder.show();
+                    break;
+            }
         }
     };
 
@@ -60,6 +167,9 @@ public class MainActivity extends Activity {
         linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
         rvFileList.setLayoutManager(linearLayoutManager);
         rvFileList.setNestedScrollingEnabled(false);
+        rvFileList.setItemAnimator(new DefaultItemAnimator());
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        view_alertDialog = getLayoutInflater().inflate(R.layout.view_alertdialog, null);
     }
 
     private void showFileDir(String path) {
@@ -95,7 +205,7 @@ public class MainActivity extends Activity {
                 fileItems.add(fileItem);
             }
         }
-        mAdapter = new FileListAdapter(MainActivity.this, fileItems, itemClickCallback);
+        mAdapter = new FileListAdapter(MainActivity.this, fileItems, itemClickCallback, itemLongClickCallback);
         rvFileList.setAdapter(mAdapter);
     }
 
@@ -105,6 +215,10 @@ public class MainActivity extends Activity {
         fileItem.setType(FileItem.TYPE_DIRECTPRY);
         fileItem.setFileName("..");
         fileItems.add(fileItem);
+    }
+
+    private void EncryptFile() {
+
     }
 
     /**

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.android.chen.filesecuritysystem.Bean.FileItem;
 import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
+import com.android.chen.filesecuritysystem.Callback.ItemLongClickCallback;
 import com.android.chen.filesecuritysystem.R;
 import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
 
@@ -27,14 +28,17 @@ public class FileListAdapter extends RecyclerView.Adapter<MyViewHolder> {
     private List<FileItem> mFiles;
 
     private ItemClickCallback itemClickCallback;
+    private ItemLongClickCallback itemLongClickCallback;
+
 
     static final String TAG = "TAG_FileAdapter";
 
 
-    public FileListAdapter(Context mContext, List<FileItem> mFiles, ItemClickCallback itemClickCallback) {
+    public FileListAdapter(Context mContext, List<FileItem> mFiles, ItemClickCallback itemClickCallback, ItemLongClickCallback itemLongClickCallback) {
         this.mContext = mContext;
         this.mFiles = mFiles;
         this.itemClickCallback = itemClickCallback;
+        this.itemLongClickCallback = itemLongClickCallback;
         layoutInflater = LayoutInflater.from(mContext);
     }
 
@@ -67,6 +71,7 @@ public class FileListAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         holder.tvFileName.setText(mFiles.get(position).getFileName());
         holder.itemClickCallback = itemClickCallback;
+        holder.itemLongClickCallback = itemLongClickCallback;
         /**
          * 判断是否是第一个返回上一级的item，并传入对应的文件路径。
          */
@@ -74,8 +79,8 @@ public class FileListAdapter extends RecyclerView.Adapter<MyViewHolder> {
         holder.type = type;
         holder.mContext = mContext;
         holder.position = position;
-
     }
+
 
 }
 
@@ -86,13 +91,14 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
 
     Context mContext;
     ItemClickCallback itemClickCallback;
+    ItemLongClickCallback itemLongClickCallback;
     String filePath;
     String type;
     int position;
 
     static final String TAG = "TAG_MyViewHolder";
 
-    public MyViewHolder(View itemView) {
+    MyViewHolder(View itemView) {
         super(itemView);
         ivFileIcon = (ImageView) itemView.findViewById(R.id.ivFileIcon);
         tvFileName = (TextView) itemView.findViewById(R.id.tvFileName);
@@ -105,7 +111,7 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
         if (type.equals(FileItem.TYPE_DIRECTPRY)) {
             if (position == 0) {
                 filePath = FilePathHeap.pop();
-                if (filePath == null){
+                if (filePath == null) {
                     Toast.makeText(mContext, "已经是根目录了", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -115,12 +121,13 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
             }
             itemClickCallback.updateView(filePath);
         } else {
-            Toast.makeText(mContext, "这不是一个文件夹", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "长按加密或解密", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public boolean onLongClick(View v) {
-        return false;
+        itemLongClickCallback.longClick(type);
+        return true;
     }
 }
