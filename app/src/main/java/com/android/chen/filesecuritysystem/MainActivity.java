@@ -3,6 +3,8 @@ package com.android.chen.filesecuritysystem;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,13 +13,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.chen.filesecuritysystem.Adapter.FileListAdapter;
 import com.android.chen.filesecuritysystem.Bean.FileItem;
 import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
 import com.android.chen.filesecuritysystem.Callback.ItemLongClickCallback;
+import com.android.chen.filesecuritysystem.CryptionFile.CryptionFile;
 import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
+import com.android.chen.filesecuritysystem.Tools.MessageConstant;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,11 +42,32 @@ public class MainActivity extends Activity {
     LinearLayoutManager linearLayoutManager;
 
     AlertDialog.Builder alertDialogBuilder;
+    ProgressBar progressBar;
 
     View view_alertDialog;
     EditText etPasswd;
     EditText etConfirmPasswd;
     LinearLayout llConfirmView;
+
+    CryptionFile cryptionFile;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MessageConstant.MSG_ENCRYPT_SUCCESSFUL:
+                    Toast.makeText(MainActivity.this, "加密成功", Toast.LENGTH_SHORT).show();
+                    showFileDir(FilePathHeap.filePathList.get(0));
+                    break;
+                case MessageConstant.MSG_DECRYPT_SUCCESSFUL:
+                    Toast.makeText(MainActivity.this, "加密成功", Toast.LENGTH_SHORT).show();
+                    showFileDir(FilePathHeap.filePathList.get(0));
+                    break;
+            }
+        }
+    };
+
 
     ItemClickCallback itemClickCallback = new ItemClickCallback() {
         @Override
@@ -52,7 +78,7 @@ public class MainActivity extends Activity {
 
     ItemLongClickCallback itemLongClickCallback = new ItemLongClickCallback() {
         @Override
-        public void longClick(String type) {
+        public void longClick(final String filePath, String type) {
             switch (type) {
                 case FileItem.TYPE_DIRECTPRY:
                     alertDialogBuilder.setTitle("sorry");
@@ -80,18 +106,26 @@ public class MainActivity extends Activity {
                         public void onClick(DialogInterface dialog, int which) {
                             String passwd = etPasswd.getText().toString();
                             String confirmPasswd = etConfirmPasswd.getText().toString();
-                            if (!passwd.equals("") && !confirmPasswd.equals("")) {
-                                if (passwd.equals(confirmPasswd)) {
-                                    dialog.dismiss();
-                                    /**
-                                     * 加密文件
-                                     */
-                                    EncryptFile();
+                            if (passwd.length() >= 8) {
+                                if (!passwd.equals("") && !confirmPasswd.equals("")) {
+                                    if (passwd.equals(confirmPasswd)) {
+                                        dialog.dismiss();
+                                        /**
+                                         * 加密文件
+                                         */
+                                        try {
+                                            EncryptFile(passwd, filePath, mHandler);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
+                                    }
                                 } else {
-                                    Toast.makeText(MainActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "请输入密码，并确认密码!", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(MainActivity.this, "请输入密码，并确认密码!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "请输入至少8位密码!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -106,7 +140,7 @@ public class MainActivity extends Activity {
                     break;
                 case FileItem.TYPE_FILE_ENCRYPTED:
                     /**
-                     * 长按加密文件
+                     * 长按解密文件
                      */
                     view_alertDialog = getLayoutInflater().inflate(R.layout.view_alertdialog, null);
                     etPasswd = (EditText) view_alertDialog.findViewById(R.id.etPasswd);
@@ -123,7 +157,11 @@ public class MainActivity extends Activity {
                                 /**
                                  * 解密文件
                                  */
-                                EncryptFile();
+                                try {
+                                    DecryptFile(passwd, filePath, mHandler);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             } else {
                                 Toast.makeText(MainActivity.this, "请输入密码!", Toast.LENGTH_SHORT).show();
                             }
@@ -142,7 +180,7 @@ public class MainActivity extends Activity {
         }
     };
 
-    static final String TAG = "TAG_MainActivity";
+    static final String TAG = "Security";
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -217,8 +255,14 @@ public class MainActivity extends Activity {
         fileItems.add(fileItem);
     }
 
-    private void EncryptFile() {
+    private void EncryptFile(String key, String filePath, Handler mHandler) throws Exception {
+        cryptionFile = new CryptionFile(key, mHandler, MainActivity.this);
+        cryptionFile.encryptFile(filePath);
+    }
 
+    private void DecryptFile(String key, String filePath, Handler mHandler) throws Exception {
+        cryptionFile = new CryptionFile(key, mHandler, MainActivity.this);
+        cryptionFile.decryptFile(filePath);
     }
 
     /**

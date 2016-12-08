@@ -4,6 +4,7 @@
       <w>ciphertext</w>
       <w>filelist</w>
       <w>filesecuritysystem</w>
+      <w>readfile</w>
     </words>
   </dictionary>
 </component>

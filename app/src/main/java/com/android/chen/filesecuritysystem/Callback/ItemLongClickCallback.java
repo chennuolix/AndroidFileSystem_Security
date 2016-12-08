@@ -5,5 +5,5 @@ package com.android.chen.filesecuritysystem.Callback;
  */
 
 public interface ItemLongClickCallback {
-    void longClick(String type);
+    void longClick(String filePath, String type);
 }

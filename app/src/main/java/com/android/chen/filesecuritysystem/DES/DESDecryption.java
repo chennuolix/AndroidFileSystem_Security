@@ -13,10 +13,10 @@ import javax.crypto.spec.DESKeySpec;
 
 public class DESDecryption {
 
-    private byte[] mCiphertext;
-    private byte[] mKey;
+    public byte[] mCiphertext;
+    public byte[] mKey;
 
-    private byte[] decrypt(byte[] ciphertext, byte[] key) throws Exception {
+    public byte[] decrypt(byte[] ciphertext, byte[] key) throws Exception {
         mCiphertext = ciphertext;
         mKey = key;
 

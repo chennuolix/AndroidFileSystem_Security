@@ -127,7 +127,7 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
 
     @Override
     public boolean onLongClick(View v) {
-        itemLongClickCallback.longClick(type);
+        itemLongClickCallback.longClick(filePath,type);
         return true;
     }
 }
