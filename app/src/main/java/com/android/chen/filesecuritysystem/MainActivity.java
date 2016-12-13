@@ -21,7 +21,7 @@ import com.android.chen.filesecuritysystem.Bean.FileItem;
 import com.android.chen.filesecuritysystem.Callback.ItemClickCallback;
 import com.android.chen.filesecuritysystem.Callback.ItemLongClickCallback;
 import com.android.chen.filesecuritysystem.CryptionFile.CryptionFile;
-import com.android.chen.filesecuritysystem.Tools.FilePathHeap;
+import com.android.chen.filesecuritysystem.FileControl.FilePathHeap;
 import com.android.chen.filesecuritysystem.Tools.MessageConstant;
 
 import java.io.File;
@@ -106,8 +106,8 @@ public class MainActivity extends Activity {
                         public void onClick(DialogInterface dialog, int which) {
                             String passwd = etPasswd.getText().toString();
                             String confirmPasswd = etConfirmPasswd.getText().toString();
-                            if (passwd.length() >= 8) {
-                                if (!passwd.equals("") && !confirmPasswd.equals("")) {
+                            if (!passwd.equals("") && !confirmPasswd.equals("")) {
+                                if (passwd.length() >= 8) {
                                     if (passwd.equals(confirmPasswd)) {
                                         dialog.dismiss();
                                         /**
