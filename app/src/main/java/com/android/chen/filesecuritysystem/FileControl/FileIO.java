@@ -50,7 +50,7 @@ public class FileIO {
             if (isSuccessful) {
                 if (type.equalsIgnoreCase("encrypt")) {
                     mHandler.obtainMessage(MessageConstant.MSG_ENCRYPT_SUCCESSFUL).sendToTarget();
-                } else {
+                } else if (type.equalsIgnoreCase("decrypt")) {
                     mHandler.obtainMessage(MessageConstant.MSG_DECRYPT_SUCCESSFUL).sendToTarget();
                 }
             }

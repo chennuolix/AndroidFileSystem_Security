@@ -25,7 +25,6 @@ public class VerifyPasswd {
     private String deviceId;
 
 
-    String TAG = "VerifyPasswd";
 
     public VerifyPasswd(Context mContext) {
         this.mContext = mContext;

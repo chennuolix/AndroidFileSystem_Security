@@ -46,6 +46,11 @@ public class CryptionFile {
 
     }
 
+    /**
+     * 加密文件
+     * @param filePath
+     * @throws Exception
+     */
     public void encryptFile(String filePath) throws Exception {
         fileIO = new FileIO(mHandler);
         verifyPasswd = new VerifyPasswd(mContext);
@@ -69,6 +74,11 @@ public class CryptionFile {
         }
     }
 
+    /**
+     * 解密文件
+     * @param filePath
+     * @throws Exception
+     */
     public void decryptFile(String filePath) throws Exception {
         fileIO = new FileIO(mHandler);
         verifyPasswd = new VerifyPasswd(mContext);

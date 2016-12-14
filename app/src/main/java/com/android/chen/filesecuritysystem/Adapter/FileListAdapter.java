@@ -31,7 +31,6 @@ public class FileListAdapter extends RecyclerView.Adapter<MyViewHolder> {
     private ItemLongClickCallback itemLongClickCallback;
 
 
-    static final String TAG = "TAG_FileAdapter";
 
 
     public FileListAdapter(Context mContext, List<FileItem> mFiles, ItemClickCallback itemClickCallback, ItemLongClickCallback itemLongClickCallback) {
@@ -64,7 +63,7 @@ public class FileListAdapter extends RecyclerView.Adapter<MyViewHolder> {
             case FileItem.TYPE_FILE_DECRYPT:
                 holder.ivFileIcon.setImageResource(R.mipmap.file);
                 break;
-            case FileItem.TYPE_DIRECTPRY:
+            case FileItem.TYPE_DIRECTORY:
                 holder.ivFileIcon.setImageResource(R.mipmap.directory);
                 break;
         }
@@ -96,7 +95,6 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
     String type;
     int position;
 
-    static final String TAG = "TAG_MyViewHolder";
 
     MyViewHolder(View itemView) {
         super(itemView);
@@ -108,7 +106,7 @@ class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (type.equals(FileItem.TYPE_DIRECTPRY)) {
+        if (type.equals(FileItem.TYPE_DIRECTORY)) {
             if (position == 0) {
                 filePath = FilePathHeap.pop();
                 if (filePath == null) {

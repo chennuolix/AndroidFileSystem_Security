@@ -21,16 +21,11 @@ public class DESDecryption {
         mKey = key;
 
         SecureRandom secureRandom = new SecureRandom();
-
         DESKeySpec desKeySpec = new DESKeySpec(mKey);
-
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey secretKey = secretKeyFactory.generateSecret(desKeySpec);
-
         Cipher cipher = Cipher.getInstance("DES");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, secureRandom);
-
         return cipher.doFinal(mCiphertext);
     }
-
 }

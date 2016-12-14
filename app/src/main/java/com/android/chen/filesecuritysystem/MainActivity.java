@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
                     showFileDir(FilePathHeap.filePathList.get(0));
                     break;
                 case MessageConstant.MSG_DECRYPT_SUCCESSFUL:
-                    Toast.makeText(MainActivity.this, "加密成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "解密成功", Toast.LENGTH_SHORT).show();
                     showFileDir(FilePathHeap.filePathList.get(0));
                     break;
             }
@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
         @Override
         public void longClick(final String filePath, String type) {
             switch (type) {
-                case FileItem.TYPE_DIRECTPRY:
+                case FileItem.TYPE_DIRECTORY:
                     alertDialogBuilder.setTitle("sorry");
                     alertDialogBuilder.setMessage("对不起，暂不支持文件夹加密");
                     alertDialogBuilder.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
@@ -238,7 +238,7 @@ public class MainActivity extends Activity {
                         }
                     }
                 } else {
-                    fileItem.setType(FileItem.TYPE_DIRECTPRY);
+                    fileItem.setType(FileItem.TYPE_DIRECTORY);
                 }
                 fileItems.add(fileItem);
             }
@@ -250,7 +250,7 @@ public class MainActivity extends Activity {
 
     private void addFirstItem() {
         FileItem fileItem = new FileItem();
-        fileItem.setType(FileItem.TYPE_DIRECTPRY);
+        fileItem.setType(FileItem.TYPE_DIRECTORY);
         fileItem.setFileName("..");
         fileItems.add(fileItem);
     }
