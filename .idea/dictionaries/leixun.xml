@@ -1,9 +1,17 @@
 <component name="ProjectDictionaryState">
   <dictionary name="leixun">
     <words>
+<<<<<<< HEAD
       <w>ciphertext</w>
       <w>filelist</w>
       <w>filesecuritysystem</w>
+=======
+      <w>cryption</w>
+      <w>directpry</w>
+      <w>passswd</w>
+      <w>passwd</w>
+      <w>validationcode</w>
+>>>>>>> dev_chen
     </words>
   </dictionary>
 </component>

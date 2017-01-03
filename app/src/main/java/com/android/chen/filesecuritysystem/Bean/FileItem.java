@@ -8,7 +8,11 @@ public class FileItem {
 
     public static final String TYPE_FILE_ENCRYPTED = "encrypted_file";
     public static final String TYPE_FILE_DECRYPT = "decrypt_file";
+<<<<<<< HEAD
     public static final String TYPE_DIRECTPRY = "directory";
+=======
+    public static final String TYPE_DIRECTORY = "directory";
+>>>>>>> dev_chen
 
 
     private String filePath;
