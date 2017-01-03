@@ -24,6 +24,7 @@
         android:layout_marginRight="10dp"
         android:gravity="center_vertical"
         android:hint="为了安全性，密码至少8位哦"
+        android:inputType="textPassword"
         android:lines="1" />
 
 
@@ -52,6 +53,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical"
+            android:inputType="textPassword"
             android:lines="1" />
 
     </LinearLayout>
